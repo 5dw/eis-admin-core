@@ -1,11 +1,8 @@
-const path = require('path');
-
-export default {
+module.exports = {
   eisInit: (ctx) => {
     const { Vue, store, config } = ctx;
 
     const app = {
-      // FieldComponents: Object.assign({}, builtInDisplayComponents, builtInFieldComponents),
       FieldComponents: {},
     };
     // all configurations stored in app.config, include config for each module
@@ -36,22 +33,9 @@ export default {
       return localModules;
     };
 
-    let localModules;
-    let globalModules;
-    let CustomerModules;
-
-    if (path.resolve(__dirname).indexOf('node_modules') >= 0) {
-      console.log('core is running from node_modules.')
-      localModules = loadModulesFromFolder(require.context('../../src/modules', true, /\/eis-admin-[^/]+\/index\.js$/));
-      globalModules = loadModulesFromFolder(require.context('../', true, /\/eis-admin-[^/]+\/index\.js$/));
-      CustomerModules = loadModulesFromFolder(require.context('../../src/modules', true, /\/[^/]+\/index\.js$/), './', 'eis-admin-');
-    }
-    else {
-      console.log('core is running from local modules.')
-      localModules = loadModulesFromFolder(require.context('../', true, /\/eis-admin-[^/]+\/index\.js$/));
-      globalModules = loadModulesFromFolder(require.context('../../../node_modules', true, /\/eis-admin-[^/]+\/index\.js$/));
-      CustomerModules = loadModulesFromFolder(require.context('../', true, /\/[^/]+\/index\.js$/), './', 'eis-admin-');
-    }
+    const localModules = loadModulesFromFolder(require.context('../../src/modules', true, /\/eis-admin-[^/]+\/index\.js$/));
+    const globalModules = loadModulesFromFolder(require.context('../../node_modules', true, /\/eis-admin-[^/]+\/index\.js$/));
+    const CustomerModules = loadModulesFromFolder(require.context('../../src/modules', true, /\/[^/]+\/index\.js$/), './', 'eis-admin-');
 
     const loadModule = (m) => {
       let mdl = CustomerModules[m] || localModules[m] || globalModules[m];
@@ -82,8 +66,6 @@ export default {
             // const desc = mdl.$t(`${vk}Description`);
             app.validators[vk] = {
               name: vk,
-              // validatorName: mdl.$t(`${vk}Name`),
-              // validatorDescription: desc === `${vk}Description` ? '' : desc,
               validator: mdl.validators[vk],
             };
           }
@@ -111,12 +93,6 @@ export default {
     const addRefRouters = (rc) => {
       if (!rc) return rc;
       if (typeof rc === 'string' || (typeof rc === 'object' && rc.ref && typeof rc.ref === 'string')) {
-        // if in dev environment and if we set the dev configurations already,
-        // use the router in the development-tools
-        if ((process.env.DEV || process.env.NODE_ENV === 'development') && typeof rc === 'object' && rc.dev && app.moduleNames.indexOf('development-tools') >= 0) {
-          const devRoute = app.modules['development-tools'].devRouter(app, rc.dev);
-          return Object.merge(rc, devRoute);
-        }
         // the child is string, means referrence to another module
         const rcList = (rc.ref || rc).split('>');
         const depModule = app.modules[rcList[0]];
