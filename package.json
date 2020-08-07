@@ -1,6 +1,6 @@
 {
   "name": "eis-admin-core",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "The core module for frontend of the EIS system.",
   "main": "index.js",
   "author": "zhiquan",
