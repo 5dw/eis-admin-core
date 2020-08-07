@@ -4,5 +4,7 @@
   "description": "The core module for frontend of the EIS system.",
   "main": "index.js",
   "author": "zhiquan",
-  "license": "GPL-1.0-or-later"
+  "license": "GPL-1.0-or-later",
+  "repository": "git@gitlab.com:eis-modules/eis-admin-core.git",
+  "private": false
 }
