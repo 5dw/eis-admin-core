@@ -1,4 +1,6 @@
-module.exports = {
+import Mock from 'mockjs';
+
+export default {
   eisInit: (ctx) => {
     const { Vue, store, config } = ctx;
 
@@ -187,7 +189,7 @@ module.exports = {
 
       // register mock api
       if (mdl.mock && typeof mdl.mock === 'function') {
-        mdl.mock(import('mockjs').mock);
+        mdl.mock(Mock);
       }
 
       // modify module views
