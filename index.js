@@ -185,6 +185,11 @@ module.exports = {
         app.FieldComponents = Object.assign(app.FieldComponents, mdl.fieldComponents);
       }
 
+      // register mock api
+      if (mdl.mock && typeof mdl.mock === 'function') {
+        mdl.mock(import('mockjs').mock);
+      }
+
       // modify module views
       if (mdl.config && mdl.config.views && Array.isArray(mdl.config.views)
         && mdl.config.views.length) {

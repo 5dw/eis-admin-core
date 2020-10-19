@@ -6,5 +6,8 @@
   "author": "zhiquan",
   "license": "GPL-1.0-or-later",
   "repository": "git@gitlab.com:eis-modules/eis-admin-core.git",
-  "private": false
+  "private": false,
+  "dependencies": {
+    "mockjs": "^1.1.0"
+  }
 }
