@@ -35,9 +35,36 @@ export default {
       return localModules;
     };
 
+    // load i18n dict from local modules folder
+    const loadI18nModulesFromFolder = (context, pre = './eis-admin-', ext = '') => {
+      const localI18nModules = {};
+      const contextKeys = context.keys();
+      for (let i = 0; i < contextKeys.length; i += 1) {
+        if (!ext || contextKeys[i].indexOf(ext) < 0) {
+          let mn = contextKeys[i].substr(pre.length);
+          mn = mn.substr(0, mn.indexOf('/'));
+
+          if (contextKeys[i].startsWith(`${pre}${mn}/i18n/`)) {
+            const i18nMatch = contextKeys[i].substr(`${pre}${mn}/i18n/`.length).match(/([^/]+)\/index\.js/);
+            if (i18nMatch && i18nMatch[1]) {
+              localI18nModules[mn] = localI18nModules[mn] || {};
+              localI18nModules[mn][i18nMatch[1]] = context(contextKeys[i]).default;
+            }
+          }
+        }
+      }
+      return localI18nModules;
+    };
+
     const localModules = loadModulesFromFolder(require.context('../../src/modules', true, /\/eis-admin-[^/]+\/index\.js$/));
     const globalModules = loadModulesFromFolder(require.context('../../node_modules', true, /\/eis-admin-[^/]+\/index\.js$/));
     const CustomerModules = loadModulesFromFolder(require.context('../../src/modules', true, /\/[^/]+\/index\.js$/), './', 'eis-admin-');
+
+    const localI18nModules = loadI18nModulesFromFolder(require.context('../../src/modules', true, /\/eis-admin-[^/]+\/i18n\/[^/]+\/[^/]+\.js$/));
+    const globalI18nModules = loadI18nModulesFromFolder(require.context('../../node_modules', true, /\/eis-admin-[^/]+\/i18n\/[^/]+\/[^/]+\.js$/));
+    const CustomerI18nModules = loadI18nModulesFromFolder(require.context('../../src/modules', true, /\/[^/]+\/i18n\/[^/]+\/[^/]+\.js$/), './', 'eis-admin-');
+
+    const i18nMessages = {};
 
     const loadModule = (m) => {
       let mdl = CustomerModules[m] || localModules[m] || globalModules[m];
@@ -71,6 +98,15 @@ export default {
               validator: mdl.validators[vk],
             };
           }
+        });
+      }
+
+      // register module i18n translates
+      let i18nMdl = CustomerI18nModules[m] || localI18nModules[m] || globalI18nModules[m];
+
+      if (i18nMdl) {
+        Object.keys(i18nMdl).forEach(ik => {
+          i18nMessages[ik] = { ...i18nMessages[ik], ...i18nMdl[ik] };
         });
       }
 
@@ -206,6 +242,15 @@ export default {
           }
         }
       }
+    }
+
+    // register i18n translates
+    Object.keys(config.i18n || {}).forEach(ik => {
+      i18nMessages[ik] = { ...i18nMessages[ik], ...config.i18n[ik] };
+    });
+
+    if (ctx.store) {
+      ctx.store.i18nMessages = i18nMessages;
     }
 
     // get route list from module routers and merge config
