@@ -187,17 +187,18 @@ export default {
       }
     }
 
-    const modifyModuleView = (routers, view) => {
+    const modifyModuleView = (routers, view, p = '') => {
       for (let i = 0; i < routers.length; i += 1) {
         const router = routers[i];
 
-        if (router.path === view.view) {
+        if (new RegExp(view.view).test(`${p}/${router.path}`)
+          && (!router.children || router.children.findIndex(cld => cld.path === '') < 0)) {
           router.component = view.component || router.component;
           router.props = view.props || router.props;
         }
 
         if (router.children) {
-          modifyModuleView(router.children, view);
+          modifyModuleView(router.children, view, `${p}/${router.path}`);
         }
       }
     };
