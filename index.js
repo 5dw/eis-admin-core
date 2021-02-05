@@ -256,7 +256,9 @@ export default {
     let routes = [];
     for (let i = 0; i < app.config.modules.length; i += 1) {
       const mdl = app.modules[app.config.modules[i]];
-      if (mdl.routers) { routes = routes.concat(mdl.routers); }
+      if (mdl.routers && (!app.config.rootModule || app.config.modules[i] === app.config.rootModule)) {
+        routes = routes.concat(mdl.routers);
+      }
     }
 
     // eslint-disable-next-line no-underscore-dangle
