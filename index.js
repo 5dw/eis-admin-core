@@ -1,3 +1,5 @@
+import { extend } from 'quasar';
+
 export default {
     eisInit: (ctx) => {
         const { Vue, store, config } = ctx;
@@ -145,7 +147,7 @@ export default {
                 let realRouters = depModule.routers;
                 for (let j = 1; j < rcList.length; j += 1) {
                     const rName = rcList[j];
-                    const childRRouter = realRouters.find(rr => rr.name === rName || rr.path === rName);
+                    const childRRouter = realRouters.find(rr => rr.name === rName || rr.path === rName || rr.name === `/${rName}` || rr.path === `/${rName}`);
                     if (!childRRouter) {
                         throw new Error(`Child router ${rName} is not found in ${rcList[0]}`);
                     }
@@ -163,9 +165,10 @@ export default {
                 }
 
                 if (rc.ref) {
-                    return Object.merge(realRouters, rc);
+                  return Object.merge(extend(true, [], realRouters), rc);
                 }
-                return realRouters;
+
+                return extend(true, [], realRouters);
             }
             if (rc.children) {
                 for (let i = 0; i < rc.children.length; i += 1) {
